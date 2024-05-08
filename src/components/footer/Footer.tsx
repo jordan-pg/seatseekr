@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
 				}}
 			>
 				<Typography variant="subtitle1">
-					Copyright © SeatSeekr 2023.
+					Copyright © SeatWyze 2024.
 				</Typography>
 			</Box>
 		</footer>

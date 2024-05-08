@@ -4,7 +4,7 @@ import { Raleway } from "next/font/google";
 const inter = Raleway({ subsets: ["latin"], display: 'swap' });
 
 export const metadata: Metadata = {
-	title: "SeatSeekr - Discover Cheap Tickets",
+	title: "SeatWyze - Discover Cheap Tickets",
 	description: "Explore Countless Cheap Events with a Single Search",
 	icons: {
 		icon: ["/favicon.ico", "/apple-touch-icon.png", "/android-chrome-192x192.png", "/android-chrome-512x512.png"]

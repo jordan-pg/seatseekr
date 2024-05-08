@@ -127,7 +127,7 @@ const Navigation = () => {
 	const drawer = (
 		<Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
 			<Typography variant="h6" sx={{ my: 2 }}>
-				SeatSeekr
+				SeatWyze
 			</Typography>
 			<Divider />
 			<List sx={{ textAlign: "start", m: 2 }}>
