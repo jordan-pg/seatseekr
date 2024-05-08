@@ -124,6 +124,8 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 									item?.seatGeek?.seatGeekPrice || Infinity,
 									item?.ticketMaster?.ticketMasterPrice ||
 										Infinity,
+									item?.gameTime?.gameTimePrice ||
+										Infinity,
 								]
 							);
 
@@ -132,7 +134,8 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 									xs={6}
 									key={
 										item?.ticketMaster?.ticketMasterId ||
-										item?.seatGeek?.seatGeekId
+										item?.seatGeek?.seatGeekId ||
+										item?.gameTime?.gameTimeId
 									}
 								>
 									<StyledCard
@@ -174,12 +177,11 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 										<CardMedia
 											sx={{ height: 225 }}
 											image={
-												item?.images &&
-												item?.images?.length > 0
-													? `${item?.images?.[0]?.url}?w=248&auto=format`
+												item?.images
+													? `${item?.images}?w=248&auto=format`
 													: `https://images.pexels.com/photos/301673/pexels-photo-301673.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2`
 											}
-											title={item.images?.[0]?.url}
+											title={item?.images}
 										/>
 										<CardContent
 											sx={{

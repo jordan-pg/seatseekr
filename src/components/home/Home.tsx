@@ -3,20 +3,18 @@ import { styled } from "@mui/system";
 import {
 	Alert,
 	Box,
-	Button,
 	Container,
 	IconButton,
 	Link,
 	Snackbar,
-	TextField,
 	Typography,
 } from "@mui/material";
 import Searchbar from "@/components/searchbar/Searchbar";
 import CloseIcon from "@mui/icons-material/Cancel";
 import theme from "../theme/theme";
-import {data as testData} from './data'
+import { searchStubHub } from "@/api/stubHubActions";
+import { searchGameTime } from "@/api/gameTimeActions";
 
-// Styled component for the background image
 const Background = styled("div")`
 	background-image: url("home-background.png");
 	background-size: cover;
@@ -37,41 +35,11 @@ const Home = () => {
 	const [open, setOpen] = useState<boolean>(true);
 	const [seeMore, setSeeMore] = useState<boolean>(false);
 
-	async function generatePDF(data: any) {
-		const url = 'https://generateresumepdf-tl7oxsojoq-uc.a.run.app';
-		const response = await fetch(url, {
-			method: 'POST',
-			body: JSON.stringify(data),
-		});
-	
-		if (!response.ok) {
-			throw new Error(`Error: ${response.statusText}`);
-		}
-	
-		return await response.blob();
-	}
-	
-	// Example usage
-	generatePDF({ data: testData, type: 'modern' })
-		.then(pdfBlob => {
-			console.log(pdfBlob)
-			// Handle the PDF blob here (e.g., download or display it)
-			const url = window.URL.createObjectURL(new Blob([pdfBlob]));
-			const a = document.createElement('a');
-			a.style.display = 'none';
-			a.href = url;
-			a.download = 'document.pdf';
-			document.body.appendChild(a);
-			a.click();
-			window.URL.revokeObjectURL(url);
-			a.remove();
-		
+	useEffect(() => {
+		searchGameTime({ keyword: 'padres' }).then((res) => {
+			console.log('RESPONSE', res)
 		})
-		.catch(error => {
-			console.error('Failed to generate PDF:', error);
-		});
-	
-
+	}, [])
 
 	return (
 		<Background id="home">

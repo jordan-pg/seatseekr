@@ -1,3 +1,4 @@
+"use server";
 import { EventData } from "@/types/types";
 import axios from "axios";
 import moment from "moment-timezone";

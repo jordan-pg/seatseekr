@@ -12,22 +12,19 @@ import {
 	Toolbar,
 	Box,
 	List,
-	ListItem,
-	Divider,
-	Button,
 	Popover,
 	Alert,
 	Snackbar,
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 import {
-	ChevronRight,
 	Close as CloseIcon,
 	InfoRounded,
 } from "@mui/icons-material";
-import theme from "../theme/theme";
 import { EventData } from "@/types/types";
-import Link from "next/link";
+import TicketMasterModal from "./TicketMasterModal";
+import SeatGeekModal from "./SeatGeekModal";
+import GameTimeModal from "./GameTimeModal";
 
 interface EventModalProps {
 	open: boolean;
@@ -64,12 +61,12 @@ const EventModal: React.FC<EventModalProps> = ({
 		setAnchorEl(null);
 	};
 
-	const handleSelected = (eventUrl: string | undefined) => {
-		setOpenAlert(true);
-		setTimeout(() => {
-			window.open(eventUrl, "_blank");
-		}, 1000);
-	};
+	// const handleSelected = (eventUrl: string | undefined) => {
+	// 	setOpenAlert(true);
+	// 	setTimeout(() => {
+	// 		window.open(eventUrl, "_blank");
+	// 	}, 1000);
+	// };
 
 	const openPopover = Boolean(anchorEl);
 	const id = openPopover ? "simple-popover" : undefined;
@@ -107,7 +104,7 @@ const EventModal: React.FC<EventModalProps> = ({
 							>
 								**Prices include fees**
 							</Typography>
-							{event?.images?.[0]?.url && (
+							{event?.images && (
 								<CardMedia
 									title={event?.name}
 									sx={{
@@ -118,7 +115,7 @@ const EventModal: React.FC<EventModalProps> = ({
 											xs: 180,
 										},
 									}}
-									image={event?.images?.[0]?.url}
+									image={event?.images}
 								/>
 							)}
 						</Card>
@@ -165,135 +162,14 @@ const EventModal: React.FC<EventModalProps> = ({
 			<DialogActions>
 				<List sx={{ width: "100%" }}>
 					{event?.ticketMaster && (
-						<>
-							<Divider sx={{ borderColor: "white" }} />
-							<ListItem sx={{ justifyContent: "space-between" }}>
-								<Box>
-									<Typography
-										variant="subtitle1"
-										fontWeight="bold"
-									>
-										Ticketmaster
-									</Typography>
-									<Typography
-										variant="subtitle2"
-										color={theme.palette.primary.main}
-									>
-										{event?.ticketMaster
-											?.ticketMasterPrice ? (
-											<>
-												Starting at{" "}
-												<b
-													style={{
-														color: "limegreen",
-													}}
-												>
-													$
-													{Math.floor(
-														event?.ticketMaster
-															?.ticketMasterPrice
-													)}
-												</b>
-											</>
-										) : (
-											"Click select for more details"
-										)}
-									</Typography>
-								</Box>
-								<Link
-									href={String(event?.ticketMaster?.ticketMasterUrl)}
-									rel="noopener noreferrer"
-									target="_blank"
-									style={{color: theme.palette.primary.main}}
-								>
-									<Box display="inline-flex">
-										<Typography
-											variant="subtitle1"
-											color={theme.palette.primary.main}
-											fontWeight="bold"
-											sx={{ textDecoration: "underline" }}
-										>
-											Select
-										</Typography>
-										<ChevronRight />
-									</Box>
-								</Link>
-							</ListItem>
-						</>
+						<TicketMasterModal event={event} />
 					)}
 					{event?.seatGeek && (
-						<>
-							<Divider sx={{ borderColor: "white" }} />
-							<ListItem sx={{ justifyContent: "space-between" }}>
-								<Box>
-									<Typography
-										variant="subtitle1"
-										fontWeight="bold"
-									>
-										SeatGeek
-									</Typography>
-									<Typography
-										variant="subtitle2"
-										color={theme.palette.primary.main}
-									>
-										{event?.seatGeek?.seatGeekPrice ? (
-											<>
-												Starting at{" "}
-												<b
-													style={{
-														color: "limegreen",
-													}}
-												>
-													$
-													{Math.floor(
-														event?.seatGeek
-															?.seatGeekPrice
-													)}
-												</b>
-											</>
-										) : (
-											"Click select for more details"
-										)}
-									</Typography>
-								</Box>
-								<Link
-									href={String(event?.seatGeek?.seatGeekUrl)}
-									rel="noopener noreferrer"
-									target="_blank"
-									style={{color: theme.palette.primary.main}}
-								>
-									<Box display="inline-flex">
-										<Typography
-											variant="subtitle1"
-											color={theme.palette.primary.main}
-											fontWeight="bold"
-											sx={{ textDecoration: "underline" }}
-										>
-											Select
-										</Typography>
-										<ChevronRight />
-									</Box>
-								</Link>
-							</ListItem>
-						</>
+						<SeatGeekModal event={event} />
 					)}
-					{/* <Divider sx={{ borderColor: "white" }} />				 */}
-					{/* <ListItem sx={{ justifyContent: "space-between" }}>
-						<Box>
-							<Typography variant="subtitle1" fontWeight="bold">
-								Vivid Seats
-							</Typography>
-							<Typography
-								variant="subtitle2"
-								color={theme.palette.primary.main}
-							>
-								Not Available Yet
-							</Typography>
-						</Box>
-						<Button>
-							Select <ChevronRight />
-						</Button>
-					</ListItem> */}
+					{event?.gameTime && (
+						<GameTimeModal event={event} />
+					)}
 				</List>
 				<Snackbar
 					open={openAlert}

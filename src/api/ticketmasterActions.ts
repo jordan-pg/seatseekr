@@ -1,3 +1,4 @@
+"use server";
 import { EventData } from "@/types/types";
 import axios from "axios";
 import moment from "moment-timezone";
@@ -42,12 +43,22 @@ export const searchTicketMasterEvents = async ({
 		const newData: EventData[] = await response?.data?._embedded?.events
 			?.map((event: any) => {
 				const timezone = event?.dates?.timezone;
-				const date = event?.dates?.start?.dateTime;
 
-				const parsedDate = moment.tz(date, timezone);
-				const formattedDate = parsedDate.format(
-					"ddd MMM Do, YYYY @ h:mm a"
-				);
+				let date;
+
+				if (
+					event?.dates?.start?.localDate &&
+					event?.dates?.start?.localTime
+				) {
+					const combinedLocalDateTime = `${event?.dates?.start?.localDate}T${event?.dates?.start?.localTime}`;
+					const formattedLocalDateTime = moment(
+						combinedLocalDateTime
+					).format("ddd MMM Do, YYYY @ h:mm a");
+
+					date = formattedLocalDateTime;
+				} else {
+					return null;
+				}
 
 				if (
 					event?.url &&
@@ -56,7 +67,7 @@ export const searchTicketMasterEvents = async ({
 				) {
 					return {
 						name: event?.name,
-						date: formattedDate,
+						date,
 						localDate: event?.dates?.start?.localDate,
 						timezone: timezone,
 						info: event?.info,
@@ -64,7 +75,7 @@ export const searchTicketMasterEvents = async ({
 						venueCity: event?._embedded?.venues?.[0]?.city?.name,
 						venueState:
 							event?._embedded?.venues?.[0]?.state?.stateCode,
-						images: event?.images,
+						images: event?.images?.[0]?.url,
 						ticketMaster: {
 							ticketMasterId: event?.id,
 							ticketMasterUrl: event?.url,

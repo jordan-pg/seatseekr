@@ -1,219 +1,139 @@
-import moment from "moment";
+import levenshtein from "fast-levenshtein";
+import moment, { Moment } from "moment";
 import { EventData, Location } from "@/types/types";
-import {
-	searchPopularSeatGeekEvents,
-	searchSeatGeekEvents,
-} from "@/api/seatgeekActions";
 import {
 	searchTicketMasterEvents,
 	searchTicketMasterPopularEvents,
-} from "@/api/ticketmasterActions";
+} from "./ticketmasterActions";
+import {
+	searchPopularSeatGeekEvents,
+	searchSeatGeekEvents,
+} from "./seatgeekActions";
+import { searchGameTime } from "./gameTimeActions";
 
-export const searchEvents = async ({ keyword }: { keyword: string }) => {
-	try {
-		const ticketMasterData = await searchTicketMasterEvents({ keyword });
-		const seatGeekData = await searchSeatGeekEvents({ keyword });
+// Normalize string for comparison
+const normalizeString = (input: string): string => {
+	return input.toLowerCase().replace(/[^a-z0-9]+/g, "");
+};
 
-		const events: EventData[] = [];
+// Check if two venue names are similar
+const isVenueNameSimilar = (name1: string, name2: string): boolean => {
+	const threshold = 3; // Levenshtein distance threshold
+	return (
+		levenshtein.get(normalizeString(name1), normalizeString(name2)) <=
+		threshold
+	);
+};
 
-		ticketMasterData?.forEach((ticketMasterEvent: EventData) => {
-			const matchingSeatGeekEvent = seatGeekData?.find(
-				(seatGeekEvent) => {
-					const seatGeekVenue = seatGeekEvent?.venueName?.substring(
-						0,
-						3
-					);
-					const ticketMasterVenue =
-						ticketMasterEvent?.venueName?.substring(0, 3);
-					const parsedDate1 = moment(
-						seatGeekEvent?.date,
-						"ddd MMM Do, YYYY @ h:mm a"
-					);
-					const parsedDate2 = moment(
-						ticketMasterEvent?.date,
-						"ddd MMM Do, YYYY @ h:mm a"
-					);
+// Check if two dates are within a certain difference (e.g., 20 minutes)
+const isDateWithinThreshold = (
+	date1: string,
+	date2: string,
+	minutesThreshold: number = 20
+): boolean => {
+	const format = "ddd MMM Do, YYYY @ h:mm a";
+	const moment1: Moment = moment(date1, format);
+	const moment2: Moment = moment(date2, format);
 
-					const seatGeekDate = parsedDate1.clone().startOf("hour");
-					const ticketMasterDate = parsedDate2
-						.clone()
-						.startOf("hour");
-
-					return (
-						seatGeekVenue === ticketMasterVenue &&
-						seatGeekDate.isSame(ticketMasterDate)
-					);
-				}
-			);
-
-			if (matchingSeatGeekEvent) {
-				const modifiedTicketMasterEvent: EventData = {
-					...ticketMasterEvent,
-					seatGeek: {
-						seatGeekId: matchingSeatGeekEvent?.seatGeek?.seatGeekId,
-						seatGeekUrl:
-							matchingSeatGeekEvent?.seatGeek?.seatGeekUrl,
-						seatGeekPrice:
-							matchingSeatGeekEvent?.seatGeek?.seatGeekPrice,
-					},
-				};
-				events.push(modifiedTicketMasterEvent);
-			} else {
-				events.push(ticketMasterEvent);
-			}
-		});
-
-		seatGeekData?.forEach((seatGeekEvent: EventData) => {
-			const matchingTicketMasterEvent = ticketMasterData?.find(
-				(ticketMasterEvent) => {
-					const seatGeekVenue = seatGeekEvent?.venueName?.substring(
-						0,
-						3
-					);
-					const ticketMasterVenue =
-						ticketMasterEvent?.venueName?.substring(0, 3);
-					const seatGeekDate = seatGeekEvent?.date?.substring(0, 12);
-					const ticketMasterDate = ticketMasterEvent?.date?.substring(
-						0,
-						12
-					);
-
-					return (
-						seatGeekVenue === ticketMasterVenue &&
-						seatGeekDate === ticketMasterDate
-					);
-				}
-			);
-
-			if (!matchingTicketMasterEvent) {
-				events.push(seatGeekEvent);
-			}
-		});
-
-		events.forEach((obj) => {
-			obj.momentDate = moment(obj.date, "ddd MMM Do, YYYY @ h:mm a");
-		});
-		events.sort((a, b) => a.momentDate.diff(b.momentDate));
-		events.forEach((obj) => {
-			delete obj.momentDate;
-		});
-
-		return events;
-	} catch (error) {
-		console.error("Error in searchEvents:", error);
-		return [];
+	if (!moment1.isValid() || !moment2.isValid()) {
+		return false;
 	}
+
+	const diffMinutes = Math.abs(moment1.diff(moment2, "minutes"));
+	return diffMinutes <= minutesThreshold;
+};
+
+// Compare both venue name and date
+const isSimilarVenueAndDate = (
+	event1: EventData,
+	event2: EventData
+): boolean => {
+	return (
+		isVenueNameSimilar(event1.venueName, event2.venueName) &&
+		isDateWithinThreshold(event1.date, event2.date)
+	);
+};
+
+// Utility function to merge two objects without overwriting non-null properties
+const mergeProperties = (target: EventData, source: EventData): void => {
+	for (const key in source) {
+		if (source[key] !== null && source[key] !== undefined) {
+			target[key] = source[key];
+		}
+	}
+};
+
+const mergeEvents = (arrays: EventData[][]): EventData[] => {
+	const result: EventData[] = [];
+	arrays.flat().forEach((item) => {
+		let found = false;
+		for (let resultItem of result) {
+			if (isSimilarVenueAndDate(resultItem, item)) {
+				mergeProperties(resultItem, item);
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			result.push({ ...item });
+		}
+	});
+	return result;
+};
+
+const sortEventsByDate = (events: EventData[]): EventData[] => {
+	const format = "ddd MMM Do, YYYY @ h:mm a";
+	return events.sort((a, b) => {
+		const momentA = moment(a.date, format);
+		const momentB = moment(b.date, format);
+		return momentA.isBefore(momentB)
+			? -1
+			: momentA.isAfter(momentB)
+			? 1
+			: 0;
+	});
+};
+
+export const searchEvents = async ({
+	keyword,
+}: {
+	keyword: string;
+}): Promise<EventData[]> => {
+	const ticketMasterData =
+		(await searchTicketMasterEvents({ keyword })) ?? [];
+	const seatGeekData = (await searchSeatGeekEvents({ keyword })) ?? [];
+	const gameTimeData = (await searchGameTime({ keyword })) ?? [];
+
+	console.log({gameTimeData})
+
+	const mergedEvents = mergeEvents([ticketMasterData, seatGeekData, gameTimeData]);
+
+	return sortEventsByDate(mergedEvents);
 };
 
 export const searchPopularEvents = async ({
 	location,
 }: {
 	location?: Location;
-}) => {
-	const events: EventData[] = [];
+}): Promise<EventData[]> => {
+	let lat = location?.lat;
+	let lon = location?.lon;
 
-	try {
-		let lat = location?.lat;
-		let lon = location?.lon;
-
-		if (!lat || !lon) {
-			lat = 34.075795;
-			lon = -118.281328;
-		}
-
-		const ticketMasterData = await searchTicketMasterPopularEvents({
-			location: location?.hashLocation,
-		});
-		const seatGeekData = await searchPopularSeatGeekEvents({
-			lat,
-			lon,
-		});
-
-		ticketMasterData?.forEach((ticketMasterEvent: EventData) => {
-			const matchingSeatGeekEvent = seatGeekData?.find(
-				(seatGeekEvent) => {
-					const seatGeekVenue = seatGeekEvent?.venueName?.substring(
-						0,
-						3
-					);
-					const ticketMasterVenue =
-						ticketMasterEvent?.venueName?.substring(0, 3);
-					const parsedDate1 = moment(
-						seatGeekEvent?.date,
-						"ddd MMM Do, YYYY @ h:mm a"
-					);
-					const parsedDate2 = moment(
-						ticketMasterEvent?.date,
-						"ddd MMM Do, YYYY @ h:mm a"
-					);
-
-					const seatGeekDate = parsedDate1.clone().startOf("hour");
-					const ticketMasterDate = parsedDate2
-						.clone()
-						.startOf("hour");
-
-					return (
-						seatGeekVenue === ticketMasterVenue &&
-						seatGeekDate.isSame(ticketMasterDate)
-					);
-				}
-			);
-
-			if (matchingSeatGeekEvent) {
-				const modifiedTicketMasterEvent: EventData = {
-					...ticketMasterEvent,
-					seatGeek: {
-						seatGeekId: matchingSeatGeekEvent?.seatGeek?.seatGeekId,
-						seatGeekUrl:
-							matchingSeatGeekEvent?.seatGeek?.seatGeekUrl,
-						seatGeekPrice:
-							matchingSeatGeekEvent?.seatGeek?.seatGeekPrice,
-					},
-				};
-				events.push(modifiedTicketMasterEvent);
-			} else {
-				events.push(ticketMasterEvent);
-			}
-		});
-
-		seatGeekData?.forEach((seatGeekEvent: EventData) => {
-			const matchingTicketMasterEvent = ticketMasterData?.find(
-				(ticketMasterEvent) => {
-					const seatGeekVenue = seatGeekEvent?.venueName?.substring(
-						0,
-						3
-					);
-					const ticketMasterVenue =
-						ticketMasterEvent?.venueName?.substring(0, 3);
-					const seatGeekDate = seatGeekEvent?.date?.substring(0, 12);
-					const ticketMasterDate = ticketMasterEvent?.date?.substring(
-						0,
-						12
-					);
-
-					return (
-						seatGeekVenue === ticketMasterVenue &&
-						seatGeekDate === ticketMasterDate
-					);
-				}
-			);
-
-			if (!matchingTicketMasterEvent) {
-				events.push(seatGeekEvent);
-			}
-		});
-
-		events.forEach((obj) => {
-			obj.momentDate = moment(obj.date, "ddd MMM Do, YYYY @ h:mm a");
-		});
-		events.sort((a, b) => a.momentDate.diff(b.momentDate));
-		events.forEach((obj) => {
-			delete obj.momentDate;
-		});
-
-		return events?.slice(0, 6);
-	} catch (error) {
-		console.error("Error in searchEvents:", error);
-		return [];
+	if (!lat || !lon) {
+		lat = 34.075795;
+		lon = -118.281328;
 	}
+
+	const ticketMasterData =
+		(await searchTicketMasterPopularEvents({
+			location: location?.hashLocation,
+		})) ?? [];
+	const seatGeekData =
+		(await searchPopularSeatGeekEvents({ lat, lon })) ?? [];
+
+	const popularEvents = mergeEvents([ticketMasterData, seatGeekData]);
+
+	const limitPopularEvents = popularEvents.slice(0, 6);
+
+	return sortEventsByDate(limitPopularEvents);
 };
