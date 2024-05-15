@@ -10,17 +10,19 @@ import {
 	searchSeatGeekEvents,
 } from "./seatgeekActions";
 import { searchGameTime } from "./gameTimeActions";
+import { searchVividSeats } from "./vividSeatsActions";
 
 // Normalize string for comparison
 const normalizeString = (input: string): string => {
-	return input.toLowerCase().replace(/[^a-z0-9]+/g, "");
+	return input?.toLowerCase()?.replace(/[^a-z0-9]+/g, "");
 };
 
 // Check if two venue names are similar
 const isVenueNameSimilar = (name1: string, name2: string): boolean => {
+	if (!name1 || !name2) return false;
 	const threshold = 3; // Levenshtein distance threshold
 	return (
-		levenshtein.get(normalizeString(name1), normalizeString(name2)) <=
+		levenshtein?.get(normalizeString(name1), normalizeString(name2)) <=
 		threshold
 	);
 };
@@ -49,8 +51,8 @@ const isSimilarVenueAndDate = (
 	event2: EventData
 ): boolean => {
 	return (
-		isVenueNameSimilar(event1.venueName, event2.venueName) &&
-		isDateWithinThreshold(event1.date, event2.date)
+		isVenueNameSimilar(event1?.venueName, event2?.venueName) &&
+		isDateWithinThreshold(event1?.date, event2?.date)
 	);
 };
 
@@ -65,7 +67,7 @@ const mergeProperties = (target: EventData, source: EventData): void => {
 
 const mergeEvents = (arrays: EventData[][]): EventData[] => {
 	const result: EventData[] = [];
-	arrays.flat().forEach((item) => {
+	arrays?.flat()?.forEach((item) => {
 		let found = false;
 		for (let resultItem of result) {
 			if (isSimilarVenueAndDate(resultItem, item)) {
@@ -103,12 +105,24 @@ export const searchEvents = async ({
 		(await searchTicketMasterEvents({ keyword })) ?? [];
 	const seatGeekData = (await searchSeatGeekEvents({ keyword })) ?? [];
 	const gameTimeData = (await searchGameTime({ keyword })) ?? [];
+	const vividSeatsData = (await searchVividSeats({ keyword })) ?? [];
 
-	console.log({gameTimeData})
+	const mergedEvents = mergeEvents([
+		ticketMasterData,
+		seatGeekData,
+		gameTimeData,
+		vividSeatsData,
+	]);
 
-	const mergedEvents = mergeEvents([ticketMasterData, seatGeekData, gameTimeData]);
+	const filteredEvents = mergedEvents.filter(
+		(event) =>
+			event.ticketMaster?.ticketMasterPrice !== undefined ||
+			event.seatGeek?.seatGeekPrice !== undefined ||
+			event.gameTime?.gameTimePrice !== undefined ||
+			event.vividSeats?.vividSeatsPrice !== undefined
+	);
 
-	return sortEventsByDate(mergedEvents);
+	return sortEventsByDate(filteredEvents);
 };
 
 export const searchPopularEvents = async ({
@@ -131,7 +145,11 @@ export const searchPopularEvents = async ({
 	const seatGeekData =
 		(await searchPopularSeatGeekEvents({ lat, lon })) ?? [];
 
-	const popularEvents = mergeEvents([ticketMasterData, seatGeekData]);
+	const popularEvents = mergeEvents([ticketMasterData, seatGeekData]).filter(
+		(item) =>
+			item.ticketMaster?.ticketMasterPrice !== undefined ||
+			item.seatGeek?.seatGeekPrice !== undefined
+	);
 
 	const limitPopularEvents = popularEvents.slice(0, 6);
 

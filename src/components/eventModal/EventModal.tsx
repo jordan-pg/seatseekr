@@ -17,14 +17,12 @@ import {
 	Snackbar,
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
-import {
-	Close as CloseIcon,
-	InfoRounded,
-} from "@mui/icons-material";
+import { Close as CloseIcon, InfoRounded } from "@mui/icons-material";
 import { EventData } from "@/types/types";
 import TicketMasterModal from "./TicketMasterModal";
 import SeatGeekModal from "./SeatGeekModal";
 import GameTimeModal from "./GameTimeModal";
+import VividSeatsModal from "./VividSeatsModal";
 
 interface EventModalProps {
 	open: boolean;
@@ -61,15 +59,37 @@ const EventModal: React.FC<EventModalProps> = ({
 		setAnchorEl(null);
 	};
 
-	// const handleSelected = (eventUrl: string | undefined) => {
-	// 	setOpenAlert(true);
-	// 	setTimeout(() => {
-	// 		window.open(eventUrl, "_blank");
-	// 	}, 1000);
-	// };
-
 	const openPopover = Boolean(anchorEl);
 	const id = openPopover ? "simple-popover" : undefined;
+
+	const modalComponents = [
+		{
+			price: event?.ticketMaster?.ticketMasterPrice,
+			component: <TicketMasterModal event={event} />,
+		},
+		{
+			price: event?.seatGeek?.seatGeekPrice,
+			component: <SeatGeekModal event={event} />,
+		},
+		{
+			price: event?.gameTime?.gameTimePrice,
+			component: <GameTimeModal event={event} />,
+		},
+		{
+			price: event?.vividSeats?.vividSeatsPrice,
+			component: <VividSeatsModal event={event} />,
+		},
+	];
+
+	// Filter out undefined prices and sort by price
+	const sortedComponents = modalComponents
+		.filter((modal) => modal.price !== undefined)
+		.sort((a, b) => {
+			if (a.price === undefined || b.price === undefined) {
+				return 0;
+			}
+			return a.price - b.price;
+		});
 
 	return (
 		<Dialog
@@ -77,10 +97,11 @@ const EventModal: React.FC<EventModalProps> = ({
 			open={open}
 			onClose={onClose}
 			TransitionComponent={Transition}
+			scroll="body"
 		>
 			{event && (
 				<>
-					<AppBar sx={{ position: "relative" }}>
+					<AppBar sx={{ position: "sticky" }}>
 						<Toolbar>
 							<Typography
 								sx={{ flex: 1, p: 2 }}
@@ -94,7 +115,7 @@ const EventModal: React.FC<EventModalProps> = ({
 							</IconButton>
 						</Toolbar>
 					</AppBar>
-					<DialogContent>
+					<DialogContent dividers={false}>
 						<Card>
 							<Typography
 								fontStyle="italic"
@@ -159,17 +180,12 @@ const EventModal: React.FC<EventModalProps> = ({
 					</DialogContent>
 				</>
 			)}
-			<DialogActions>
-				<List sx={{ width: "100%" }}>
-					{event?.ticketMaster && (
-						<TicketMasterModal event={event} />
-					)}
-					{event?.seatGeek && (
-						<SeatGeekModal event={event} />
-					)}
-					{event?.gameTime && (
-						<GameTimeModal event={event} />
-					)}
+			<DialogActions sx={{ p: 0 }}>
+				<List
+					sx={{ width: "100%", "& > * + *": { mt: 2 } }}
+					disablePadding
+				>
+					{sortedComponents.map((modal) => modal.component)}
 				</List>
 				<Snackbar
 					open={openAlert}

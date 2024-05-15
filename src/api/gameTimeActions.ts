@@ -27,7 +27,6 @@ export const searchGameTime = async ({ keyword }: { keyword?: string }) => {
 				);
 
 				return {
-					event: event,
 					name: event?.name,
 					date: formattedDate,
 					localDate: date,

@@ -1,14 +1,18 @@
 import { ChevronRight } from "@mui/icons-material";
-import { Divider, ListItem, Box, Typography } from "@mui/material";
-import Link from "next/link";
+import { Box, Typography, ListItemButton } from "@mui/material";
 import theme from "../theme/theme";
 import { EventData } from "@/types/types";
 
 const TicketMasterModal = ({ event }: { event: EventData }) => {
 	return (
 		<>
-			<Divider sx={{ borderColor: "white" }} />
-			<ListItem sx={{ justifyContent: "space-between" }}>
+			<ListItemButton
+				sx={{ justifyContent: "space-between", bgcolor: "#3D5A80", my: .5 }}
+				href={String(event?.ticketMaster?.ticketMasterUrl)}
+				rel="noopener noreferrer"
+				target="_blank"
+				divider
+			>
 				<Box>
 					<Typography variant="subtitle1" fontWeight="bold">
 						Ticketmaster
@@ -36,27 +40,10 @@ const TicketMasterModal = ({ event }: { event: EventData }) => {
 						)}
 					</Typography>
 				</Box>
-				<Link
-					href={String(event?.ticketMaster?.ticketMasterUrl)}
-					rel="noopener noreferrer"
-					target="_blank"
-					style={{
-						color: theme.palette.primary.main,
-					}}
-				>
-					<Box display="inline-flex">
-						<Typography
-							variant="subtitle1"
-							color={theme.palette.primary.main}
-							fontWeight="bold"
-							sx={{ textDecoration: "underline" }}
-						>
-							Select
-						</Typography>
-						<ChevronRight />
-					</Box>
-				</Link>
-			</ListItem>
+				<Box display="inline-flex">
+					<ChevronRight />
+				</Box>
+			</ListItemButton>
 		</>
 	);
 };

@@ -192,9 +192,9 @@ const Navigation = () => {
 						>
 							<NavLink href="/">
 								<img
-									src="/newlogo.png"
+									src="/logo.png"
 									alt="logo"
-									width={180}
+									width={160}
 									height={30}
 									style={{ cursor: "pointer" }}
 								/>

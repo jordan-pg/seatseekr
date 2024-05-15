@@ -12,6 +12,7 @@ export interface EventData {
 	ticketMaster?: TicketMaster;
 	seatGeek?: SeatGeek;
 	gameTime?: GameTime;
+	vividSeats?: VividSeats;
 	[key: string]: any; 
 }
 
@@ -31,6 +32,12 @@ interface GameTime {
 	gameTimeId?: string;
 	gameTimeUrl?: string;
 	gameTimePrice?: number;
+}
+
+interface VividSeats {
+	vividSeatsId?: string;
+	vividSeatsUrl?: string;
+	vividSeatsPrice?: number;
 }
 
 export interface Location {

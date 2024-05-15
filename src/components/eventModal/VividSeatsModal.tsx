@@ -4,25 +4,25 @@ import Link from "next/link";
 import theme from "../theme/theme";
 import { EventData } from "@/types/types";
 
-const SeatGeekModal = ({ event }: { event: EventData }) => {
+const VividSeatsModal = ({ event }: { event: EventData }) => {
 	return (
 		<>
 			<ListItemButton
 				sx={{ justifyContent: "space-between", bgcolor: "#3D5A80", my: .5 }}
-				href={String(event?.seatGeek?.seatGeekUrl)}
+				href={String(event?.vividSeats?.vividSeatsUrl)}
 				rel="noopener noreferrer"
 				target="_blank"
 				divider
 			>
 				<Box>
 					<Typography variant="subtitle1" fontWeight="bold">
-						SeatGeek
+						Vivid Seats
 					</Typography>
 					<Typography
 						variant="subtitle2"
 						color={theme.palette.primary.main}
 					>
-						{event?.seatGeek?.seatGeekPrice ? (
+						{event?.vividSeats?.vividSeatsPrice ? (
 							<>
 								Starting at{" "}
 								<b
@@ -31,7 +31,9 @@ const SeatGeekModal = ({ event }: { event: EventData }) => {
 									}}
 								>
 									$
-									{Math.floor(event?.seatGeek?.seatGeekPrice)}
+									{Math.floor(
+										event?.vividSeats?.vividSeatsPrice
+									)}
 								</b>
 							</>
 						) : (
@@ -47,4 +49,4 @@ const SeatGeekModal = ({ event }: { event: EventData }) => {
 	);
 };
 
-export default SeatGeekModal;
+export default VividSeatsModal;

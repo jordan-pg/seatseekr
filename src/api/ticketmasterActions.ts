@@ -114,29 +114,39 @@ export const searchTicketMasterPopularEvents = async ({
 
 		const newData: EventData[] = await filteredEvents?.map((event: any) => {
 			const timezone = event?.dates?.timezone;
-			const date = event?.dates?.start?.dateTime;
+			
+			let date;
 
-			const parsedDate = moment.tz(date, timezone);
-			const formattedDate = parsedDate.format(
-				"ddd MMM Do, YYYY @ h:mm a"
-			);
+			if (
+				event?.dates?.start?.localDate &&
+				event?.dates?.start?.localTime
+			) {
+				const combinedLocalDateTime = `${event?.dates?.start?.localDate}T${event?.dates?.start?.localTime}`;
+				const formattedLocalDateTime = moment(
+					combinedLocalDateTime
+				).format("ddd MMM Do, YYYY @ h:mm a");
 
+				date = formattedLocalDateTime;
+			} else {
+				return null;
+			}
 			return {
 				name: event?.name,
-				date: formattedDate,
+				date,
 				localDate: event?.dates?.start?.localDate,
 				timezone: timezone,
 				info: event?.info,
-				venueName: event?._embedded?.venues?.[0]?.name,
+				venueName: event?._embedded?.venues?.[0]?.name?.trim(),
 				venueCity: event?._embedded?.venues?.[0]?.city?.name,
-				venueState: event?._embedded?.venues?.[0]?.state?.stateCode,
-				images: event?.images,
+				venueState:
+					event?._embedded?.venues?.[0]?.state?.stateCode,
+				images: event?.images?.[0]?.url,
 				ticketMaster: {
 					ticketMasterId: event?.id,
 					ticketMasterUrl: event?.url,
 					ticketMasterPrice: event?.priceRanges?.[0]?.min,
 				},
-			};
+			}
 		});
 		return newData;
 	} catch (error) {

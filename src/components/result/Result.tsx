@@ -14,12 +14,12 @@ import { AttachMoney, ChevronRight } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import theme from "../theme/theme";
 import { useEffect, useState } from "react";
-import Geohash from "latlon-geohash";
 import { useSearchParams } from "next/navigation";
 import EventModal from "../eventModal/EventModal";
 import Searchbar from "@/components/searchbar/Searchbar";
-import { EventData, Location } from "@/types/types";
+import { EventData } from "@/types/types";
 import { searchEvents, searchPopularEvents } from "@/api/combinedActions";
+import { useLocation } from "../contexts/LocationContext";
 
 const StyledCard = styled(Card)(({ theme }) => ({
 	position: "relative",
@@ -45,34 +45,17 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 	const searchParams = useSearchParams();
 	const eventParams = searchParams.get("keyword") as string;
 	const [data, setData] = useState<EventData[]>([]);
-	const [location, setLocation] = useState<Location | undefined>(undefined);
 	const [open, setOpen] = useState(false);
 	const [selectedEvent, setSelectedEvent] = useState(undefined);
 	const [loading, setLoading] = useState<boolean>(false);
 
-	useEffect(() => {
-		if (!location) {
-			navigator.geolocation.getCurrentPosition((position) => {
-				const geoLocation = Geohash.encode(
-					position.coords.latitude,
-					position.coords.longitude,
-					7
-				);
-
-				setLocation({
-					hashLocation: geoLocation,
-					lat: position.coords.latitude,
-					lon: position.coords.longitude,
-				});
-			});
-		}
-	}, []);
+	const location = useLocation();
 
 	useEffect(() => {
 		setLoading(true);
 
 		if (popular) {
-			searchPopularEvents({ location }).then((res) => {
+			searchPopularEvents({ location } as any).then((res) => {
 				setData(res as any);
 				setLoading(false);
 			});
@@ -135,7 +118,8 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 									key={
 										item?.ticketMaster?.ticketMasterId ||
 										item?.seatGeek?.seatGeekId ||
-										item?.gameTime?.gameTimeId
+										item?.gameTime?.gameTimeId ||
+										item?.vividSeats?.vividSeatsId
 									}
 								>
 									<StyledCard
