@@ -47,7 +47,7 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 	const [data, setData] = useState<EventData[]>([]);
 	const [open, setOpen] = useState(false);
 	const [selectedEvent, setSelectedEvent] = useState(undefined);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(true);
 
 	const location = useLocation();
 
@@ -71,6 +71,8 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 		setSelectedEvent(event);
 		setOpen(true);
 	};
+
+	console.log({loading})
 
 	return (
 		<Box sx={{ width: "100%" }}>
