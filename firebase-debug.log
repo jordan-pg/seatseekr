@@ -1,0 +1,46 @@
+[debug] [2024-05-15T07:33:10.512Z] ----------------------------------------------------------------------
+[debug] [2024-05-15T07:33:10.516Z] Command:       /Users/jordangriffin/.nvm/versions/node/v20.2.0/bin/node /Users/jordangriffin/.nvm/versions/node/v20.2.0/bin/firebase deploy
+[debug] [2024-05-15T07:33:10.516Z] CLI Version:   13.8.2
+[debug] [2024-05-15T07:33:10.516Z] Platform:      darwin
+[debug] [2024-05-15T07:33:10.516Z] Node Version:  v20.2.0
+[debug] [2024-05-15T07:33:10.516Z] Time:          Wed May 15 2024 00:33:10 GMT-0700 (Pacific Daylight Time)
+[debug] [2024-05-15T07:33:10.516Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-05-15T07:33:10.551Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-05-15T07:33:10.552Z] > authorizing via signed-in user (jordan.p.griffin@gmail.com)
+[debug] [2024-05-15T07:33:10.552Z] [iam] checking project seatseekr-882a9 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2024-05-15T07:33:10.553Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/seatseekr-882a9:testIamPermissions [none]
+[debug] [2024-05-15T07:33:10.553Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/seatseekr-882a9:testIamPermissions x-goog-quota-user=projects/seatseekr-882a9
+[debug] [2024-05-15T07:33:10.553Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/seatseekr-882a9:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-05-15T07:33:10.883Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/seatseekr-882a9:testIamPermissions 200
+[debug] [2024-05-15T07:33:10.884Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/seatseekr-882a9:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-05-15T07:33:10.884Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/seatseekr-882a9 [none]
+[debug] [2024-05-15T07:33:11.439Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/seatseekr-882a9 200
+[debug] [2024-05-15T07:33:11.439Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/seatseekr-882a9 {"projectId":"seatseekr-882a9","projectNumber":"186480459863","displayName":"seatwyze","name":"projects/seatseekr-882a9","resources":{"hostingSite":"seatseekr-882a9"},"state":"ACTIVE","etag":"1_44606afa-20f0-47e9-89db-a7ecd0d50879"}
+[debug] [2024-05-15T07:33:12.524Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/seatseekr-882a9/sites pageToken=&pageSize=10
+[debug] [2024-05-15T07:33:13.083Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/seatseekr-882a9/sites 200
+[debug] [2024-05-15T07:33:13.083Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/seatseekr-882a9/sites {"sites":[{"name":"projects/seatseekr-882a9/sites/seatseekr-882a9","defaultUrl":"https://seatseekr-882a9.web.app","appId":"1:186480459863:web:8de66e76892199dcde2312","type":"DEFAULT_SITE"}]}
+[debug] [2024-05-15T07:33:13.084Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:186480459863:web:8de66e76892199dcde2312/config [none]
+[debug] [2024-05-15T07:33:13.649Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:186480459863:web:8de66e76892199dcde2312/config 200
+[debug] [2024-05-15T07:33:13.649Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:186480459863:web:8de66e76892199dcde2312/config {"projectId":"seatseekr-882a9","appId":"1:186480459863:web:8de66e76892199dcde2312","storageBucket":"seatseekr-882a9.appspot.com","apiKey":"AIzaSyCOb_QxUC6gbFbm531NZar9SFWZOeqs2oA","authDomain":"seatseekr-882a9.firebaseapp.com","messagingSenderId":"186480459863","measurementId":"G-BX39SGJ9TW"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+   The integration is known to work with Next.js version 12 - 14.0. You may encounter errors.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2024-05-15T07:33:15.823Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/seatseekr-882a9/sites/seatseekr-882a9 [none]
+[debug] [2024-05-15T07:33:15.992Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/seatseekr-882a9/sites/seatseekr-882a9 200
+[debug] [2024-05-15T07:33:15.992Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/seatseekr-882a9/sites/seatseekr-882a9 {"name":"projects/seatseekr-882a9/sites/seatseekr-882a9","defaultUrl":"https://seatseekr-882a9.web.app","appId":"1:186480459863:web:8de66e76892199dcde2312","type":"DEFAULT_SITE"}
+[info]   ▲ Next.js 14.2.3
+
+[info]   - Environments: .env
+
+
+[info]    Creating an optimized production build ...
+
