@@ -72,8 +72,6 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 		setOpen(true);
 	};
 
-	console.log({loading})
-
 	return (
 		<Box sx={{ width: "100%" }}>
 			{!popular && <Searchbar incomingValue={eventParams} />}
@@ -109,7 +107,8 @@ const ResultList = ({ popular }: { popular?: boolean }) => {
 									item?.seatGeek?.seatGeekPrice || Infinity,
 									item?.ticketMaster?.ticketMasterPrice ||
 										Infinity,
-									item?.gameTime?.gameTimePrice ||
+									item?.gameTime?.gameTimePrice || Infinity,
+									item?.vividSeats?.vividSeatsPrice ||
 										Infinity,
 								]
 							);

@@ -7,8 +7,25 @@ export const metadata: Metadata = {
 	title: "SeatWyze - Discover Cheap Tickets",
 	description: "Explore Countless Cheap Events with a Single Search",
 	icons: {
-		icon: ["/favicon.ico", "/apple-touch-icon.png", "/android-chrome-192x192.png", "/android-chrome-512x512.png"]
-	},
+		icon: [
+		  {
+			url: '/favicon.ico',
+			href: '/favicon.ico',
+		  },
+		  {
+			url: '/apple-touch-icon.png',
+			href: '/apple-touch-icon.png',
+		  },
+		  {
+			url: '/android-chrome-192x192.png',
+			href: '/android-chrome-192x192.png',
+		  },
+		  {
+			url: '/android-chrome-512x512.png',
+			href: '/android-chrome-512x512.png',
+		  },
+		],
+	  },
 };
 
 export default function RootLayout({
